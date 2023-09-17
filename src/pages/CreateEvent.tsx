@@ -2,6 +2,7 @@ import { Layout } from '../components/Layout.tsx';
 import Container from '@mui/material/Container';
 import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import { useForm, SubmitHandler } from "react-hook-form"
 import { useState, FormEvent } from "react"
@@ -15,7 +16,7 @@ import { Toast } from '../components/Toast.tsx';
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
-  apiKey: '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',
+  apiKey: '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',
 });
 const openai = new OpenAIApi(configuration);
 
@@ -36,6 +37,7 @@ export function CreateEvent() {
   
   const [hasToast, setHasToast] = useState(false)
   const [eventImageSrc, setEventImageSrc] = useState('')
+  const [isEventImageLoading, setIsEventImageLoading] = useState(false)
   
   const navigate = useNavigate()
 
@@ -49,10 +51,13 @@ export function CreateEvent() {
   }
   
   const generateImage = async () => {
+    setIsEventImageLoading(true)
     const response = await openai.createImage({
-      prompt: eventName,
+      prompt: `photo from an event ${eventName}`,
       n: 1,
       size: "256x256",
+    }).finally(() => {
+      setIsEventImageLoading(false)
     });
     return response.data.data[0].url;
   }
@@ -76,8 +81,9 @@ export function CreateEvent() {
             <TextField placeholder="Time" fullWidth className="block mb-2" {...register('event_date')} />
             <TextField placeholder="Location" fullWidth className="block mb-2" {...register('event_location')} />
             <TextField placeholder="Additional Details..." fullWidth className="block mb-2" />
-            <div>
-              {eventImageSrc && <img src={eventImageSrc} alt="Event Image"/>}
+            <div className="text-center">
+              {eventImageSrc && <img src={eventImageSrc} alt="Event Image" className="block m-auto" />}
+              {isEventImageLoading && <CircularProgress />}
             </div>
             <div className="flex justify-between">
               <FormControlLabel
