@@ -45,7 +45,13 @@ export function CreateEvent() {
         setValue('event_image', res?.event_image)
         return snapshot.docs[0].data() as Inputs
       }
-      return {} as Inputs
+      return {
+        event_date: Date.now(),
+        event_description: '',
+        event_image: '',
+        event_location: '',
+        event_name: ''
+      } as Inputs
     }
   })
   
@@ -61,7 +67,9 @@ export function CreateEvent() {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     await addDoc(collection(db, "events"), data);
     setHasToast(true)
-    navigate('/')
+    window.setTimeout(() => {
+      navigate('/')
+    }, 2000)
   }
   
   const generateImage = async () => {
@@ -137,7 +145,7 @@ export function CreateEvent() {
                 control={<Checkbox onChange={handleAIGenerateImageChange} />}
                 label="AI-generated thumbnail"
               />
-              <Button type="submit">Submit</Button>
+              {!id && <Button disabled={hasToast} type="submit">Submit</Button>}
             </div>
             {hasToast && <Toast severity="success" message={`${eventName} event was created`} />}
           </form>
