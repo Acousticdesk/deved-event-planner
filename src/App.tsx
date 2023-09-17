@@ -1,16 +1,16 @@
 import TextField from '@mui/material/TextField'
 import Container from '@mui/material/Container'
-import { getFirestore, collection, getDocs, Timestamp, GeoPoint } from 'firebase/firestore/lite';
+import { collection, getDocs, GeoPoint } from 'firebase/firestore/lite';
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import { app } from './api.ts';
+import { db } from './api.ts';
 import { Layout } from './components/Layout.tsx';
 
 interface Event {
   event_name: string
-  event_date: Timestamp
+  event_date: number
   event_location: GeoPoint
 }
 
@@ -19,7 +19,6 @@ const djLocalizer = dayjsLocalizer(dayjs)
 function App() {
   const [events, setEvents] = useState<Event[]>([]);
   useEffect(() => {
-    const db = getFirestore(app);
     const eventsCollection = collection(db, 'events')
     getDocs(eventsCollection).then((snapshot) => {
       const list = snapshot.docs.map(doc => doc.data() as Event)
@@ -38,13 +37,13 @@ function App() {
           localizer={djLocalizer}
           scrollToTime={dayjs().toDate()}
           events={events.map(({ event_name, event_date }) => {
-            const endDate = event_date.toDate()
+            const endDate = new Date(event_date)
             endDate.setHours(endDate.getHours() + 1)
             return {
               id: event_name,
               title: event_name,
-              start: event_date.toDate(),
-              end: endDate,
+              start: new Date(event_date),
+              end: new Date(endDate),
             }
           })}
           startAccessor="start"
