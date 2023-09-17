@@ -163,7 +163,15 @@ export function CreateEvent() {
         <div className="w-1/2 m-auto">
           <p className="text-4xl mb-8 text-center">{pageTitle}</p>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <TextField placeholder="Event Title" fullWidth className="block mb-2" {...register('event_name')} />
+            <TextField
+              label="Event Title"
+              fullWidth
+              className="block mb-2"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              {...register('event_name')}
+            />
             <Controller
               control={control}
               name='event_date'
@@ -182,48 +190,59 @@ export function CreateEvent() {
                 />
               )}
             />
-            {isMapLoaded ? (
-              <GoogleMap
-                mapContainerStyle={containerStyle}
-                onLoad={onLoad}
-                onUnmount={onUnmount}
-                zoom={5}
-                options={{
-                  maxZoom: 17
-                }}
-                onClick={(event) => {
-                  if (id) {
-                    return
-                  }
-                  if (marker) {
-                    marker.setMap(null)
-                    setMarker(null)
-                  }
-                  
-                  const newMarker = new window.google.maps.Marker({
-                    position: event.latLng,
-                    map: map,
-                  });
-                  
-                  setMarker(newMarker)
-                  setValue('event_location', `${event.latLng?.lat()},${event.latLng?.lng()}`)
-                }}
-              />
-            ) : <CircularProgress />}
-            <TextField placeholder="Additional Details..." fullWidth className="block mb-2" {...register('event_description')} />
+            <TextField
+              label="Additional Details"
+              fullWidth
+              className="block mb-2"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              {...register('event_description')}
+            />
+            <div className="py-4">
+              {isMapLoaded ? (
+                <GoogleMap
+                  mapContainerStyle={containerStyle}
+                  onLoad={onLoad}
+                  onUnmount={onUnmount}
+                  zoom={5}
+                  options={{
+                    maxZoom: 17
+                  }}
+                  onClick={(event) => {
+                    if (id) {
+                      return
+                    }
+                    if (marker) {
+                      marker.setMap(null)
+                      setMarker(null)
+                    }
+
+                    const newMarker = new window.google.maps.Marker({
+                      position: event.latLng,
+                      map: map,
+                    });
+
+                    setMarker(newMarker)
+                    setValue('event_location', `${event.latLng?.lat()},${event.latLng?.lng()}`)
+                  }}
+                />
+              ) : <CircularProgress />}
+            </div>
             <div className="text-center">
               {eventImage && <img src={eventImage} alt="Event Image" className="block m-auto" />}
-              <TextField className="hidden" fullWidth {...register('event_image')} />
               {isEventImageLoading && <CircularProgress />}
               {eventImageError && <p>{eventImageError}</p>}
             </div>
-            <div className="flex justify-between">
-              <FormControlLabel
-                control={<Checkbox onChange={handleAIGenerateImageChange} />}
-                label="AI-generated thumbnail"
-              />
-              {!id && <Button disabled={hasToast} type="submit">Submit</Button>}
-            </div>
+            {!id && (
+              <div className="flex justify-between">
+                <FormControlLabel
+                  control={<Checkbox onChange={handleAIGenerateImageChange} />}
+                  label="AI-generated thumbnail"
+                />
+                <Button disabled={hasToast} type="submit">Submit</Button>
+              </div>
+            )}
             {hasToast && <Toast severity="success" message={`${eventName} event was created`} />}
           </form>
         </div>
