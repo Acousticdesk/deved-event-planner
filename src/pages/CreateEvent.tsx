@@ -150,30 +150,12 @@ export function CreateEvent() {
   const onLoad = useCallback(function callback(map) {
     const bounds = new window.google.maps.LatLngBounds(center);
     map.fitBounds(bounds);
-     // map.setZoom(5)
     setMap(map)
   }, [])
 
   const onUnmount = useCallback(function callback() {
     setMap(null)
   }, [])
-  
-  // useEffect(() => {
-  //   if (marker) {
-  //     marker.setMap(null)
-  //   }
-  //   if (map) {
-  //     const bounds = new window.google.maps.LatLngBounds(center);
-  //     const location = new google.maps.LatLng(center.lat, center.lng);
-  //     map.fitBounds(bounds);
-  //     const newMarker = new window.google.maps.Marker({
-  //       position: location,
-  //       map: map,
-  //     });
-  //
-  //     setMarker(newMarker)
-  //   }
-  // }, [center, map, marker])
   
   return (
     <Layout>
@@ -228,7 +210,6 @@ export function CreateEvent() {
                 }}
               />
             ) : <CircularProgress />}
-            {/*<TextField placeholder="Location" fullWidth className="block mb-2" {...register('event_location')} />*/}
             <TextField placeholder="Additional Details..." fullWidth className="block mb-2" {...register('event_description')} />
             <div className="text-center">
               {eventImage && <img src={eventImage} alt="Event Image" className="block m-auto" />}
