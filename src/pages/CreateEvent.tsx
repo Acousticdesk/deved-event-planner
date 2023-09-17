@@ -1,6 +1,7 @@
 import { Layout } from '../components/Layout.tsx';
 import Container from '@mui/material/Container';
 import Checkbox from '@mui/material/Checkbox'
+import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import { useForm, SubmitHandler } from "react-hook-form"
 import { useState } from "react"
@@ -51,7 +52,7 @@ export function CreateEvent() {
             <TextField placeholder="Additional Details..." fullWidth className="block mb-2" />
             <div className="flex justify-between">
               <FormControlLabel control={<Checkbox />} label="AI-generated thumbnail" />
-              <input type="submit" />
+              <Button type="submit">Submit</Button>
             </div>
             {hasToast && <Toast severity="success" message={`${eventName} event was created`} />}
           </form>
