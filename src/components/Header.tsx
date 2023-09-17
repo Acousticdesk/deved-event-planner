@@ -11,7 +11,7 @@ export function Header() {
           {" "}
           <Logo></Logo>{" "}
         </Link>
-        <p className="text-2xl">Edmonton Event EndPoint</p>
+        <p className="text-2xl">Edmonton EventEndpoint</p>
         <Button onClick={() => navigate("/create-event")}>Create Event</Button>
       </div>
     </div>
