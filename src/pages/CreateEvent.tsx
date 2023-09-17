@@ -163,10 +163,16 @@ export function CreateEvent() {
         <div className="w-1/2 m-auto">
           <p className="text-4xl mb-8 text-center">{pageTitle}</p>
           <form onSubmit={handleSubmit(onSubmit)}>
+            {id && eventImage && (
+              <div className="mb-4">
+                <img src={eventImage} alt="Event Image" className="block m-auto" />
+              </div>
+            )}
             <TextField
               label="Event Title"
               fullWidth
               className="block mb-2"
+              disabled={!!id}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -179,6 +185,7 @@ export function CreateEvent() {
                 <DateTimePicker
                   label="Event Time"
                   className="w-full mb-2"
+                  disabled={!!id}
                   value={dayjs(field.value)}
                   onChange={(date: Dayjs | null) => {
                     if (!date || !date.isValid()) {
@@ -194,43 +201,46 @@ export function CreateEvent() {
               label="Additional Details"
               fullWidth
               className="block mb-2"
+              disabled={!!id}
               InputLabelProps={{
                 shrink: true,
               }}
               {...register('event_description')}
             />
-            <div className="py-4">
-              {isMapLoaded ? (
-                <GoogleMap
-                  mapContainerStyle={containerStyle}
-                  onLoad={onLoad}
-                  onUnmount={onUnmount}
-                  zoom={5}
-                  options={{
-                    maxZoom: 17
-                  }}
-                  onClick={(event) => {
-                    if (id) {
-                      return
-                    }
-                    if (marker) {
-                      marker.setMap(null)
-                      setMarker(null)
-                    }
+            <div className="text-center">
+              <div className="inline-block py-4">
+                {isMapLoaded ? (
+                  <GoogleMap
+                    mapContainerStyle={containerStyle}
+                    onLoad={onLoad}
+                    onUnmount={onUnmount}
+                    zoom={5}
+                    options={{
+                      maxZoom: 17
+                    }}
+                    onClick={(event) => {
+                      if (id) {
+                        return
+                      }
+                      if (marker) {
+                        marker.setMap(null)
+                        setMarker(null)
+                      }
 
-                    const newMarker = new window.google.maps.Marker({
-                      position: event.latLng,
-                      map: map,
-                    });
+                      const newMarker = new window.google.maps.Marker({
+                        position: event.latLng,
+                        map: map,
+                      });
 
-                    setMarker(newMarker)
-                    setValue('event_location', `${event.latLng?.lat()},${event.latLng?.lng()}`)
-                  }}
-                />
-              ) : <CircularProgress />}
+                      setMarker(newMarker)
+                      setValue('event_location', `${event.latLng?.lat()},${event.latLng?.lng()}`)
+                    }}
+                  />
+                ) : <CircularProgress />}
+              </div>
             </div>
             <div className="text-center">
-              {eventImage && <img src={eventImage} alt="Event Image" className="block m-auto" />}
+              {!id && eventImage && <img src={eventImage} alt="Event Image" className="block m-auto" />}
               {isEventImageLoading && <CircularProgress />}
               {eventImageError && <p>{eventImageError}</p>}
             </div>
