@@ -1,11 +1,11 @@
-import Button from '@mui/material/Button'
+import { Link } from 'react-router-dom';
 
 export function Header() {
   return (
     <div className="border-b border-black">
       <div className="flex justify-between">
         <span className="text-3xl">Logo</span>
-        <Button variant="outlined">Create Event</Button>
+        <Link to="/create-event">Create Event</Link>
       </div>
     </div>
   )

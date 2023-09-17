@@ -4,9 +4,9 @@ import { getFirestore, collection, getDocs, Timestamp, GeoPoint } from 'firebase
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { Calendar, dayjsLocalizer } from 'react-big-calendar'
-import { Header } from './components/Header.tsx';
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { app } from './api.ts';
+import { Layout } from './components/Layout.tsx';
 
 interface Event {
   event_name: string
@@ -28,8 +28,7 @@ function App() {
   }, [])
   
   return (
-    <div>
-      <Header />
+    <Layout>
       <Container>
         <div className="p-8 flex items-center justify-center">
           <TextField placeholder="Search..." inputProps={{ className: "px-2 py-1" }} />
@@ -53,7 +52,7 @@ function App() {
           style={{ height: 500 }}
         />
       </Container>
-    </div>
+    </Layout>
   )
 }
 
