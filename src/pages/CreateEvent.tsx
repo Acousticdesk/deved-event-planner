@@ -24,6 +24,8 @@ interface Inputs {
   event_name: string
   event_date: string
   event_location: string
+  event_image: string
+  event_description: string
 }
 
 export function CreateEvent() {
@@ -80,9 +82,10 @@ export function CreateEvent() {
             <TextField placeholder="Event Title" fullWidth className="block mb-2" {...register('event_name')} />
             <TextField placeholder="Time" fullWidth className="block mb-2" {...register('event_date')} />
             <TextField placeholder="Location" fullWidth className="block mb-2" {...register('event_location')} />
-            <TextField placeholder="Additional Details..." fullWidth className="block mb-2" />
+            <TextField placeholder="Additional Details..." fullWidth className="block mb-2" {...register('event_description')} />
             <div className="text-center">
               {eventImageSrc && <img src={eventImageSrc} alt="Event Image" className="block m-auto" />}
+              <TextField className="hidden" fullWidth {...register('event_image')} value={eventImageSrc} />
               {isEventImageLoading && <CircularProgress />}
             </div>
             <div className="flex justify-between">
