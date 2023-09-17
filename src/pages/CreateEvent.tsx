@@ -124,8 +124,8 @@ export function CreateEvent() {
     googleMapsApiKey: "AIzaSyAmwORDeV0GTzkwHOJq0s6iecfaTPIOgJE"
   })
   
-  const [map, setMap] = useState(null)
-  const [marker, setMarker] = useState(null)
+  const [map, setMap] = useState<google.maps.Map | null>(null)
+  const [marker, setMarker] = useState<google.maps.Marker | null>(null)
   
   useEffect(() => {
     if (id && map) {
@@ -147,7 +147,7 @@ export function CreateEvent() {
     }
   }, [map, center.lng, center.lat])
 
-  const onLoad = useCallback(function callback(map) {
+  const onLoad = useCallback(function callback(map: google.maps.Map) {
     const bounds = new window.google.maps.LatLngBounds(center);
     map.fitBounds(bounds);
     setMap(map)
