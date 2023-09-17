@@ -16,7 +16,7 @@ import { Toast } from '../components/Toast.tsx';
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
-  apiKey: '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',
+  apiKey: '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',
 });
 const openai = new OpenAIApi(configuration);
 
@@ -53,7 +53,7 @@ export function CreateEvent() {
   const generateImage = async () => {
     setIsEventImageLoading(true)
     const response = await openai.createImage({
-      prompt: `photo from an event ${eventName}`,
+      prompt: `professional photo from event ${eventName}`,
       n: 1,
       size: "256x256",
     }).finally(() => {
