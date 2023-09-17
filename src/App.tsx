@@ -8,6 +8,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { db } from './api.ts';
 import { Layout } from './components/Layout.tsx';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 interface Event {
   event_name: string
@@ -24,6 +25,7 @@ const djLocalizer = dayjsLocalizer(dayjs)
 function App() {
   const [events, setEvents] = useState<Event[]>([]);
   const { register, watch } = useForm<Inputs>()
+  const navigate = useNavigate()
   useEffect(() => {
     const eventsCollection = collection(db, 'events')
     getDocs(eventsCollection).then((snapshot) => {
@@ -44,6 +46,9 @@ function App() {
         <Calendar
           localizer={djLocalizer}
           scrollToTime={dayjs().toDate()}
+          onSelectEvent={(event) => {
+            navigate(`/events/${event.title}`)
+          }}
           events={events.filter(({ event_name }) => event_name.toLowerCase().includes(search)).map(({ event_name, event_date }) => {
             const endDate = new Date(event_date)
             endDate.setHours(endDate.getHours() + 1)

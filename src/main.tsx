@@ -14,6 +14,10 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
+    path: "/events/:id",
+    element: <CreateEvent />,
+  },
+  {
     path: "/create-event",
     element: <CreateEvent />,
   },

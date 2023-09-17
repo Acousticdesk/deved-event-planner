@@ -6,9 +6,9 @@ import CircularProgress from '@mui/material/CircularProgress'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import { useForm, SubmitHandler } from "react-hook-form"
 import { useState, FormEvent } from "react"
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../api.ts';
-import { addDoc, collection } from 'firebase/firestore/lite';
+import { addDoc, getDocs, collection, query, where } from 'firebase/firestore/lite';
 
 import TextField from '@mui/material/TextField'
 import { Toast } from '../components/Toast.tsx';
@@ -16,7 +16,7 @@ import { Toast } from '../components/Toast.tsx';
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
-  apiKey: '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',
+  apiKey: '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',
 });
 const openai = new OpenAIApi(configuration);
 
@@ -29,11 +29,25 @@ interface Inputs {
 }
 
 export function CreateEvent() {
+  const { id } = useParams()
+  
   const {
     register,
     watch,
     handleSubmit,
-  } = useForm<Inputs>()
+  } = useForm<Inputs>({
+    defaultValues: async () => {
+      if (id) {
+        const q = query(collection(db, 'events'), where('event_name', '==', id))
+
+        const snapshot = await getDocs(q)
+        const res = snapshot.docs[0].data()
+        setEventImageSrc(res?.event_image)
+        return snapshot.docs[0].data() as Inputs
+      }
+      return {} as Inputs
+    }
+  })
   
   const eventName = watch('event_name')
   
@@ -73,11 +87,13 @@ export function CreateEvent() {
     setEventImageSrc(url)
   }
   
+  const pageTitle = id ? eventName : "Event Creation Form"
+  
   return (
     <Layout>
       <Container className="py-8">
         <div className="w-1/2 m-auto">
-          <p className="text-4xl mb-8 text-center">Event Creation Form</p>
+          <p className="text-4xl mb-8 text-center">{pageTitle}</p>
           <form onSubmit={handleSubmit(onSubmit)}>
             <TextField placeholder="Event Title" fullWidth className="block mb-2" {...register('event_name')} />
             <TextField placeholder="Time" fullWidth className="block mb-2" {...register('event_date')} />
