@@ -37,12 +37,17 @@ function App() {
         <p className="text-4xl text-center mb-2">All Events</p>
         <Calendar
           localizer={djLocalizer}
-          events={events.map(({ event_name }) => ({
-            id: event_name,
-            title: event_name,
-            start: new Date(2023, 8, 15),
-            end: new Date(2023, 8, 15),
-          }))}
+          scrollToTime={dayjs().toDate()}
+          events={events.map(({ event_name, event_date }) => {
+            const endDate = event_date.toDate()
+            endDate.setHours(endDate.getHours() + 1)
+            return {
+              id: event_name,
+              title: event_name,
+              start: event_date.toDate(),
+              end: endDate,
+            }
+          })}
           startAccessor="start"
           endAccessor="end"
           style={{ height: 500 }}
