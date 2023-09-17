@@ -64,6 +64,7 @@ export function CreateEvent() {
   }
   
   const generateImage = async () => {
+    setEventImageError('')
     try {
       const q = query(collection(db, 'keys'))
       const snapshot = await getDocs(q)
