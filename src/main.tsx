@@ -7,6 +7,8 @@ import {
 import App from './App.tsx'
 import { CreateEvent } from './pages/CreateEvent.tsx';
 import './index.css'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +27,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <RouterProvider router={router} />
+    </LocalizationProvider>
   </React.StrictMode>,
 )
