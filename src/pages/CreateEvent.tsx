@@ -35,6 +35,7 @@ export function CreateEvent() {
     register,
     watch,
     handleSubmit,
+    setValue
   } = useForm<Inputs>({
     defaultValues: async () => {
       if (id) {
@@ -42,7 +43,7 @@ export function CreateEvent() {
 
         const snapshot = await getDocs(q)
         const res = snapshot.docs[0].data()
-        setEventImageSrc(res?.event_image)
+        setValue('event_image', res?.event_image)
         return snapshot.docs[0].data() as Inputs
       }
       return {} as Inputs
@@ -50,9 +51,9 @@ export function CreateEvent() {
   })
   
   const eventName = watch('event_name')
+  const eventImage = watch('event_image')
   
   const [hasToast, setHasToast] = useState(false)
-  const [eventImageSrc, setEventImageSrc] = useState('')
   const [isEventImageLoading, setIsEventImageLoading] = useState(false)
   
   const navigate = useNavigate()
@@ -80,11 +81,11 @@ export function CreateEvent() {
   
   const handleAIGenerateImageChange = async (e: FormEvent) => {
     if (!(e.target as HTMLInputElement).checked) {
-      setEventImageSrc('')
+      setValue('event_image', '')
       return
     }
     const url = await generateImage() as string
-    setEventImageSrc(url)
+    setValue('event_image', url)
   }
   
   const pageTitle = id ? eventName : "Event Creation Form"
@@ -100,8 +101,8 @@ export function CreateEvent() {
             <TextField placeholder="Location" fullWidth className="block mb-2" {...register('event_location')} />
             <TextField placeholder="Additional Details..." fullWidth className="block mb-2" {...register('event_description')} />
             <div className="text-center">
-              {eventImageSrc && <img src={eventImageSrc} alt="Event Image" className="block m-auto" />}
-              <TextField className="hidden" fullWidth {...register('event_image')} value={eventImageSrc} />
+              {eventImage && <img src={eventImage} alt="Event Image" className="block m-auto" />}
+              <TextField className="hidden" fullWidth {...register('event_image')} />
               {isEventImageLoading && <CircularProgress />}
             </div>
             <div className="flex justify-between">
