@@ -15,11 +15,6 @@ import { Toast } from '../components/Toast.tsx';
 
 import { Configuration, OpenAIApi } from "openai";
 
-const configuration = new Configuration({
-  apiKey: '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',
-});
-const openai = new OpenAIApi(configuration);
-
 interface Inputs {
   event_name: string
   event_date: string
@@ -55,6 +50,7 @@ export function CreateEvent() {
   
   const [hasToast, setHasToast] = useState(false)
   const [isEventImageLoading, setIsEventImageLoading] = useState(false)
+  const [eventImageError, setEventImageError] = useState('')
   
   const navigate = useNavigate()
 
@@ -68,15 +64,26 @@ export function CreateEvent() {
   }
   
   const generateImage = async () => {
-    setIsEventImageLoading(true)
-    const response = await openai.createImage({
-      prompt: `professional photo from event ${eventName}`,
-      n: 1,
-      size: "256x256",
-    }).finally(() => {
-      setIsEventImageLoading(false)
-    });
-    return response.data.data[0].url;
+    try {
+      const q = query(collection(db, 'keys'))
+      const snapshot = await getDocs(q)
+      const { key } = snapshot.docs[0].data()
+      const configuration = new Configuration({
+        apiKey: key,
+      });
+      const openai = new OpenAIApi(configuration);
+      setIsEventImageLoading(true)
+      const response = await openai.createImage({
+        prompt: `professional photo from event ${eventName}`,
+        n: 1,
+        size: "256x256",
+      }).finally(() => {
+        setIsEventImageLoading(false)
+      });
+      return response.data.data[0].url;
+    } catch (e) {
+      setEventImageError("Can't generate your image now, please try again later...")
+    }
   }
   
   const handleAIGenerateImageChange = async (e: FormEvent) => {
@@ -104,6 +111,7 @@ export function CreateEvent() {
               {eventImage && <img src={eventImage} alt="Event Image" className="block m-auto" />}
               <TextField className="hidden" fullWidth {...register('event_image')} />
               {isEventImageLoading && <CircularProgress />}
+              {eventImageError && <p>{eventImageError}</p>}
             </div>
             <div className="flex justify-between">
               <FormControlLabel
