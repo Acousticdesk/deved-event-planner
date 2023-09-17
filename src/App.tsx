@@ -7,6 +7,7 @@ import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { db } from './api.ts';
 import { Layout } from './components/Layout.tsx';
+import { useForm } from 'react-hook-form';
 
 interface Event {
   event_name: string
@@ -14,10 +15,15 @@ interface Event {
   event_location: GeoPoint
 }
 
+interface Inputs {
+  search: string
+}
+
 const djLocalizer = dayjsLocalizer(dayjs)
 
 function App() {
   const [events, setEvents] = useState<Event[]>([]);
+  const { register, watch } = useForm<Inputs>()
   useEffect(() => {
     const eventsCollection = collection(db, 'events')
     getDocs(eventsCollection).then((snapshot) => {
@@ -26,17 +32,22 @@ function App() {
     });
   }, [])
   
+  const search = watch('search')
+  
   return (
     <Layout>
       <Container>
         <div className="p-8 flex items-center justify-center">
-          <TextField placeholder="Search..." inputProps={{ className: "px-2 py-1" }} />
+          <TextField placeholder="Search..." inputProps={{ className: "px-2 py-1", ...register('search') }} />
         </div>
         <p className="text-4xl text-center mb-2">All Events</p>
         <Calendar
           localizer={djLocalizer}
           scrollToTime={dayjs().toDate()}
-          events={events.map(({ event_name, event_date }) => {
+          events={events.filter(({ event_name }) => {
+            console.log(event_name, search, event_name.includes(search))
+            return event_name.toLowerCase().includes(search)
+          }).map(({ event_name, event_date }) => {
             const endDate = new Date(event_date)
             endDate.setHours(endDate.getHours() + 1)
             return {
