@@ -6,10 +6,11 @@ import CircularProgress from '@mui/material/CircularProgress'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import { useForm, SubmitHandler, Controller } from "react-hook-form"
 import dayjs from 'dayjs';
-import { useState, FormEvent } from "react"
+import { useState, FormEvent, useCallback, useEffect } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../api.ts';
 import { addDoc, getDocs, collection, query, where } from 'firebase/firestore/lite';
+import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
 
 import TextField from '@mui/material/TextField'
 import { Toast } from '../components/Toast.tsx';
@@ -25,6 +26,11 @@ interface Inputs {
   event_image: string
   event_description: string
 }
+
+const containerStyle = {
+  width: '400px',
+  height: '400px'
+};
 
 export function CreateEvent() {
   const { id } = useParams()
@@ -57,10 +63,16 @@ export function CreateEvent() {
   
   const eventName = watch('event_name')
   const eventImage = watch('event_image')
+  const eventLocation = watch('event_location')
   
   const [hasToast, setHasToast] = useState(false)
   const [isEventImageLoading, setIsEventImageLoading] = useState(false)
   const [eventImageError, setEventImageError] = useState('')
+
+  const center = {
+    lat: eventLocation ? parseFloat(eventLocation.split(',')[0]) : 53.54257718389261,
+    lng: eventLocation ? parseFloat(eventLocation.split(',')[1]) : -113.49767851787895,
+  };
   
   const navigate = useNavigate()
 
@@ -106,6 +118,62 @@ export function CreateEvent() {
   }
   
   const pageTitle = id ? eventName : "Event Creation Form"
+
+  const { isLoaded: isMapLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: "AIzaSyAmwORDeV0GTzkwHOJq0s6iecfaTPIOgJE"
+  })
+  
+  const [map, setMap] = useState(null)
+  const [marker, setMarker] = useState(null)
+  
+  useEffect(() => {
+    if (id && map) {
+      const location = new google.maps.LatLng(center.lat, center.lng);
+
+      const bounds = new window.google.maps.LatLngBounds(center);
+      map.fitBounds(bounds);
+      
+      if (marker) {
+        marker.setMap(null)
+      }
+
+      const newMarker = new window.google.maps.Marker({
+        position: location,
+        map: map,
+      });
+
+      setMarker(newMarker)
+    }
+  }, [map, center.lng, center.lat])
+
+  const onLoad = useCallback(function callback(map) {
+    const bounds = new window.google.maps.LatLngBounds(center);
+    map.fitBounds(bounds);
+     // map.setZoom(5)
+    setMap(map)
+  }, [])
+
+  const onUnmount = useCallback(function callback() {
+    setMap(null)
+  }, [])
+  
+  // useEffect(() => {
+  //   if (marker) {
+  //     marker.setMap(null)
+  //   }
+  //   if (map) {
+  //     const bounds = new window.google.maps.LatLngBounds(center);
+  //     const location = new google.maps.LatLng(center.lat, center.lng);
+  //     map.fitBounds(bounds);
+  //     const newMarker = new window.google.maps.Marker({
+  //       position: location,
+  //       map: map,
+  //     });
+  //
+  //     setMarker(newMarker)
+  //   }
+  // }, [center, map, marker])
   
   return (
     <Layout>
@@ -132,7 +200,35 @@ export function CreateEvent() {
                 />
               )}
             />
-            <TextField placeholder="Location" fullWidth className="block mb-2" {...register('event_location')} />
+            {isMapLoaded ? (
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                onLoad={onLoad}
+                onUnmount={onUnmount}
+                zoom={5}
+                options={{
+                  maxZoom: 17
+                }}
+                onClick={(event) => {
+                  if (id) {
+                    return
+                  }
+                  if (marker) {
+                    marker.setMap(null)
+                    setMarker(null)
+                  }
+                  
+                  const newMarker = new window.google.maps.Marker({
+                    position: event.latLng,
+                    map: map,
+                  });
+                  
+                  setMarker(newMarker)
+                  setValue('event_location', `${event.latLng?.lat()},${event.latLng?.lng()}`)
+                }}
+              />
+            ) : <CircularProgress />}
+            {/*<TextField placeholder="Location" fullWidth className="block mb-2" {...register('event_location')} />*/}
             <TextField placeholder="Additional Details..." fullWidth className="block mb-2" {...register('event_description')} />
             <div className="text-center">
               {eventImage && <img src={eventImage} alt="Event Image" className="block m-auto" />}
