@@ -44,10 +44,7 @@ function App() {
         <Calendar
           localizer={djLocalizer}
           scrollToTime={dayjs().toDate()}
-          events={events.filter(({ event_name }) => {
-            console.log(event_name, search, event_name.includes(search))
-            return event_name.toLowerCase().includes(search)
-          }).map(({ event_name, event_date }) => {
+          events={events.filter(({ event_name }) => event_name.toLowerCase().includes(search)).map(({ event_name, event_date }) => {
             const endDate = new Date(event_date)
             endDate.setHours(endDate.getHours() + 1)
             return {
